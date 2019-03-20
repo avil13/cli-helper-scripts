@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Reset # # # # # # # #
+off='\033[0m'         # Text Reset
+# Regular Colors
+black='\033[0;30m'    # Black
+red='\033[0;31m'      # Red
+green='\033[0;32m'    # Green
+yellow='\033[0;33m'   # Yellow
+blue='\033[0;34m'     # Blue
+purple='\033[0;35m'   # Purple
+cyan='\033[0;36m'     # Cyan
+white='\033[0;37m'    # White
+# # # # # # # # # # # #
+
+
+MakeCommitMessage() {
+    if git rev-parse --git-dir > /dev/null 2>&1
+    then
+        local gpBranch_abbr=$(git rev-parse --abbrev-ref HEAD)
+        local TASK_NAME=$(basename $gpBranch_abbr)
+        local MSG="${TASK_NAME} - $1"
+
+        echo -en $cyan "git commit -a -m '${green}${MSG}${cyan}' [N/y]:" $off
+
+        read item
+
+        if [ "$item" == "Y" ] || [ "$item" == "y" ] ; then
+            local RES=$(git commit -a -m "$MSG")
+            echo -e $RES
+        else
+            echo -en "   ${red}Not commited${off}"
+        fi
+    else
+        # Error
+        echo -e "${red} git not found... ⚠️ ${off}"
+    fi
+
+    echo -e "\n"
+}
+
+MakeCommitMessage "$*"

@@ -19,7 +19,7 @@ if (empty($argv[1])) {
 }
 
 
-$src = file_get_contents($filename);
+$src = file_get_contents(getcwd() . '/' . $filename);
 
 echo decode($src);
 

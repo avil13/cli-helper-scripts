@@ -1,0 +1,36 @@
+#!/bin/bash
+
+
+### merge prev branch in to current
+
+# Reset # # # # # # # #
+off='\033[0m'         # Text Reset
+# Regular Colors
+green='\033[0;32m'        # Green
+cyan='\033[0;36m'         # Cyan
+# Underline
+_green_='\033[4;32m'       # Green
+
+# # # # # # # # # # # #
+echo -en "${green}Merge prev branch in to current${off}\n\n"
+# # # # # # # # # # # #
+
+if git rev-parse --git-dir > /dev/null 2>&1
+then
+    # we are in a git repo
+    git checkout - &> /dev/null
+    BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    git checkout - &> /dev/null
+    #
+
+    if [ ! -z "$BRANCH" ]
+    then
+        echo -en "${green} git merge ${_green_}${BRANCH}${off} ${cyan}[N/y]:${off} "
+        item
+        read item
+        case "$item" in
+            y|Y) git merge $BRANCH ;;
+            *) echo -e "Nothing has been done" ;;
+        esac
+    fi
+fi

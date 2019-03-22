@@ -1,8 +1,19 @@
 #!/usr/bin/php
 <?php
 
+if ($argv[1] === '-h' || $argv[1] === '--help') {
+    $help = "
+ -h  help, show this message
+ -r  read string
+ -u  url encode (default - 'url decode')
+ -e  use 'UTF-8 encode' (default - 'UTF-8 decode')
+\n";
+    echo $help;
+    exit(0);
+}
 
-if (!empty($argv[1]) && $argv[1] === '-r') {
+
+if (!empty($argv[1]) && in_array('-r', $argv) ) {
     $str = readline("Enter string : ");
 
     echo decode($str);
@@ -32,14 +43,19 @@ echo decode($src);
 function decode($str) {
 
     $argv = $_SERVER['argv'];
+    $encode = in_array('-e', $argv);
 
     if (in_array('-u', $argv)) 
     {
         echo "URL decode:\n";
-        return urldecode($str) . "\n";
+        return (
+            $encode 
+                ? urlencode($str) 
+                : urldecode($str)
+            ) . "\n";
     }
 
-    return jdecoder($str);
+    return jdecoder($str, $encode);
 }
 
 
@@ -49,7 +65,7 @@ function decode($str) {
  * @param  String 
  * @return String 
  */
-function jdecoder($json_str) {
+function jdecoder($json_str, $flip = false) {
   $cyr_chars = array (
     '\u0430' => 'а', '\u0410' => 'А',
     '\u0431' => 'б', '\u0411' => 'Б',
@@ -90,6 +106,9 @@ function jdecoder($json_str) {
    '\t' => ''
   );
 
-  return strtr($json_str, $cyr_chars);
+  return strtr(
+      $json_str,  
+      $flip ? array_flip($cyr_chars) : $cyr_chars
+    );
 }
 

@@ -41,7 +41,6 @@ echo decode($src);
 
 
 function decode($str) {
-
     $argv = $_SERVER['argv'];
     $encode = in_array('-e', $argv);
 
@@ -55,7 +54,12 @@ function decode($str) {
             ) . "\n";
     }
 
-    return jdecoder($str, $encode);
+    $res = jdecoder($str, $encode);
+
+    var_dump($res);
+    exit();
+    
+    return $res;
 }
 
 
@@ -101,14 +105,15 @@ function jdecoder($json_str, $flip = false) {
     '\u044e' => 'ю', '\u042e' => 'Ю',
     '\u044f' => 'я', '\u042f' => 'Я',
 
-   '\r' => '',
-   '\n' => "\n",
-   '\t' => ''
+//    '\r' => '',
+//    '\n' => "\n",
+//    '\t' => ''
   );
 
-  return strtr(
-      $json_str,  
-      $flip ? array_flip($cyr_chars) : $cyr_chars
-    );
+  if ($flip) {
+    $cyr_chars = array_flip($cyr_chars);
+  }
+
+  return strtr($json_str, $cyr_chars);
 }
 

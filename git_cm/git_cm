@@ -25,7 +25,7 @@ MakeCommitMessage() {
 
         read item
 
-        if [ "$item" == "Y" ] || [ "$item" == "y" ] ; then
+        if [ "$item" == "Y" ] || [ "$item" == "y" ] || [ "$item" == "Н" ] || [ "$item" == "н" ] ; then
             local RES=$(git commit -a -m "$MSG")
             echo -e $RES
         else

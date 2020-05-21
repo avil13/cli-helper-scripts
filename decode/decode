@@ -1,67 +1,94 @@
 #!/usr/bin/php
 <?php
 
-if ($argv[1] === '-h' || $argv[1] === '--help') {
-    $help = "
- -h  help, show this message
- -r  read string
- -u  url encode (default - 'url decode')
- -e  use 'UTF-8 encode' (default - 'UTF-8 decode')
-\n";
-    echo $help;
-    exit(0);
+// var_dump($argv);
+
+$str = array_slice($argv, -1)[0];
+
+$len = count($argv);
+
+
+if ($len < 1 || in_array('-h', $argv)) {
+	echo getHelp();
+	return;
 }
 
 
-if (!empty($argv[1]) && in_array('-r', $argv) ) {
-    $str = readline("Enter string : ");
+if (hasKeyInArgs($argv) === false) {
+	$arr = array_slice($argv, 2);
 
-    echo decode($str);
+	$str = implode(' ', $arr);
+	
+	getDecode($str);
+	return;
+}
 
-    return;
+
+if (in_array('-f', $argv)) {
+	$index = array_search('-f', $argv);
+
+	if ($index !== false || empty($argv[$index + 1])) {
+		$filename = readline("Enter filename : ");
+	} else {
+		$filename = $argv[$index + 1];
+	}
+
+	$txt = file_get_contents(getcwd() . '/' . trim($filename));
+
+	getDecode($txt);
+	return;
+}
+
+
+if (in_array('-u', $argv) || in_array('-ue', $argv)) {
+	$index = array_search('-u', $argv);
+	$flip = false;
+
+	if (!$index) {
+		$index = array_search('-ue', $argv);
+		$flip = true;
+	}
+	
+	$strArr = array_slice($argv, $index + 1);
+
+	echo jDecoder(implode(' ', $strArr), $flip);
+	return;
 }
 
 
 
-if (empty($argv[1])) {
-    $filename = readline("Enter filename : ");
-} else {
-    $filename = $argv[1];
+// functions
+
+function getHelp() {
+	return "
+-h   help, show this message
+-f   read file
+-u   UTF-8 decode
+-ue  UTF-8 encode
+
+You can use only one key param
+
+  decode [options] [string]
+";
+}
+
+function hasKeyInArgs($args) {
+	$arr = array_slice($args, 1);
+	$keyList = ['-h', '-f', '-u', '-ue'];
+	$hasKey = false;
+
+	foreach ($arr as $val) {
+		if (in_array($val, $keyList)) {
+			$hasKey = true;
+		}
+	}
+	return $hasKey;
 }
 
 
-$src = file_get_contents(getcwd() . '/' . $filename);
-
-echo decode($src);
-
-
-/*
- | FUNCTIONS
-*/
-
-
-function decode($str) {
-    $argv = $_SERVER['argv'];
-    $encode = in_array('-e', $argv);
-
-    if (in_array('-u', $argv)) 
-    {
-        echo "URL decode:\n";
-        return (
-            $encode 
-                ? urlencode($str) 
-                : urldecode($str)
-            ) . "\n";
-    }
-
-    $res = jdecoder($str, $encode);
-
-    var_dump($res);
-    exit();
-    
-    return $res;
+function getDecode($txt) {
+	echo "\n" . urldecode($txt) . "\n\n";
 }
-
 
 
 
@@ -69,7 +96,7 @@ function decode($str) {
  * @param  String 
  * @return String 
  */
-function jdecoder($json_str, $flip = false) {
+function jDecoder($json_str, $flip = false) {
   $cyr_chars = array (
     '\u0430' => 'а', '\u0410' => 'А',
     '\u0431' => 'б', '\u0411' => 'Б',
@@ -114,6 +141,6 @@ function jdecoder($json_str, $flip = false) {
     $cyr_chars = array_flip($cyr_chars);
   }
 
-  return strtr($json_str, $cyr_chars);
+  echo "\n" . strtr($json_str, $cyr_chars) . "\n\n";
 }
 
